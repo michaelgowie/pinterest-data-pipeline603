@@ -47,7 +47,6 @@ def serialize_datetime(timestamp):
 
 
 def run_infinite_post_data_loop():
-    k = 0
     while True:
         sleep(random.randrange(0, 2))
         random_row = random.randint(0, 11000)
@@ -73,20 +72,13 @@ def run_infinite_post_data_loop():
             for row in user_selected_row:
                 user_result = dict(row._mapping)
             
-            print(pin_result)
-            print(geo_result)
             
-            print(user_result)
-            print(k)
-            k += 1
             pin_payload = json.dumps({"records": [{"value": pin_result}]})
             geo_payload = json.dumps({"records": [{"value": geo_result}]}, default=serialize_datetime)
             user_payload = json.dumps({"records": [{"value": user_result}]}, default=serialize_datetime)
             response_pin = requests.request("POST", invoke_url_pin, headers=headers, data=pin_payload)
             response_geo = requests.request("POST", invoke_url_geo, headers=headers, data=geo_payload)
             response_user = requests.request("POST", invoke_url_user, headers=headers, data=user_payload)
-            #print(type(pin_payload), type(geo_result), type(user_result))
-            print(response_geo.status_code, response_pin.status_code, response_user.status_code)
             
 
 

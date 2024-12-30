@@ -8,5 +8,26 @@ My next task was to use the Amazon API Gateway to configure an API which would s
 In order to transform the data, I set up a DataBricks notebook, and loaded the data from the S3 bucket into three dataframes, one for each of the Kafka topics, ready to be cleaned and queried. I then cleaned these three dataframes using pyspark. I removed duplicate data points, changed uninformative data into the None data type and performed functions on certain columns to make the data consistent and usable.
 In the same notebook, I began to query the data, producing multiple informative insights about the massive number of posts streamed through the pipeline. I did this using SQL.
 With the Notebook completed, I created a DAG and uploaded to an MWAA environment. I then scheduled it to run at midnight every night, so that the notebook will obtain any new data from the S3 bucket and clean it every day.
+---
+I then created a data stream pipeline with the use of Amazon kinesis and databricks. I began by increasing the functionality of the previously created API by configuring it to interact with amazon kinesis. I then created a new file, user_posting_emulation_streaming.py, which was based on the previous post emulation file, which sent the data to kinesis as opposed to S3. 
+Subsequently, I created a DataBricks notebook which dealt with streaming tables to extract the data from the kinesis stream, transform and clean it and then load it to a Delta Tables stream.
+
+
+## Files
+In this repository, we have two DataBricks notebooks. The one entitled final-S3-connector contains the code which connects to the S3 bucket, extracts the data and queries it. The file queries.sql contains these queries as well.
+We also have the 121704c19363_dag.py file which contains the DAG which runs the notebook each night. 
+We then have the two files user_posting_emulation.py, which simulates user posts and sends them to the S3 bucket, and user_posting_emulation_streaming.py, which sends the posts to Amazon Kinesis.
+Finally, we have the second notebook, Kinesis-Connector. This contains code which takes the kinesis stream and creates three delta tables streams with clean data. 
+
+## Licansing
+MIT License
+
+Copyright (c) 2024 Michael Gowie
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
 
 

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 
 notebook_task = {
-    'notebook_path': '/Workspace/Users/michaelgowie1@gmail.com/pinterest-data-pipeline/Final S3-connector 05:08:19',
+    'notebook_path': '/Workspace/Users/michaelgowie1@gmail.com/pinterest-data-pipeline/final-S3-connector',
 }
 
 

@@ -1,3 +1,5 @@
+from db_connector_class import AWSDBConnector
+
 import requests
 import yaml
 from time import sleep
@@ -13,21 +15,6 @@ import datetime
 random.seed(100)
 
 
-class AWSDBConnector:
-
-    def __init__(self):
-        with open('db_creds.yaml', 'r') as f:
-            db_creds_dict = yaml.safe_load(f)
-
-        self.HOST = db_creds_dict['HOST']
-        self.USER = db_creds_dict['USER']
-        self.PASSWORD = db_creds_dict['PASSWORD']
-        self.DATABASE = db_creds_dict['DATABASE']
-        self.PORT = db_creds_dict['PORT']
-        
-    def create_db_connector(self):
-        engine = sqlalchemy.create_engine(f"mysql+pymysql://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}?charset=utf8mb4")
-        return engine
 
 
 new_connector = AWSDBConnector()
@@ -43,7 +30,18 @@ def send_to_api(invoke_url, payload):
 def serialize_datetime(timestamp):
     return timestamp.isoformat()
 
+def retrieve_row(table_name: str, row_num: int, database_connection):
+    query_string = text(f"SELECT * FROM {table_name} LIMIT {row_num}, 1")
+    selected_row = database_connection.execute(query_string)
+            
+    for row in selected_row:
+        result = dict(row._mapping)
 
+    return result
+
+def post_data_to_api(data_dict: dict, invoke_url: str):
+    payload = json.dumps({"records": [{"value": data_dict}]}, default=serialize_datetime)
+    response = requests.request("POST", invoke_url_geo, headers=headers, data=payload)
 
 
 def run_infinite_post_data_loop():
@@ -54,31 +52,13 @@ def run_infinite_post_data_loop():
 
         with engine.connect() as connection:
 
-            pin_string = text(f"SELECT * FROM pinterest_data LIMIT {random_row}, 1")
-            pin_selected_row = connection.execute(pin_string)
+            pin_result = retrieve_row('pinterest_data', random_row, connection)
+            geo_result = retrieve_row('geolocation_data', random_row, connection)
+            user_result = retrieve_row('user_data', random_row, connection)
             
-            for row in pin_selected_row:
-                pin_result = dict(row._mapping)
-
-            geo_string = text(f"SELECT * FROM geolocation_data LIMIT {random_row}, 1")
-            geo_selected_row = connection.execute(geo_string)
-            
-            for row in geo_selected_row:
-                geo_result = dict(row._mapping)
-
-            user_string = text(f"SELECT * FROM user_data LIMIT {random_row}, 1")
-            user_selected_row = connection.execute(user_string)
-            
-            for row in user_selected_row:
-                user_result = dict(row._mapping)
-            
-            
-            pin_payload = json.dumps({"records": [{"value": pin_result}]})
-            geo_payload = json.dumps({"records": [{"value": geo_result}]}, default=serialize_datetime)
-            user_payload = json.dumps({"records": [{"value": user_result}]}, default=serialize_datetime)
-            response_pin = requests.request("POST", invoke_url_pin, headers=headers, data=pin_payload)
-            response_geo = requests.request("POST", invoke_url_geo, headers=headers, data=geo_payload)
-            response_user = requests.request("POST", invoke_url_user, headers=headers, data=user_payload)
+            post_data_to_api(pin_result, invoke_url_pin)
+            post_data_to_api(geo_result, invoke_url_geo)
+            post_data_to_api(user_result, invoke_url_user)
             
 
 

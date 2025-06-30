@@ -28,7 +28,7 @@ Subsequently, I created a DataBricks notebook which dealt with streaming tables 
 * We then have the two files `user_posting_emulation.py`, which simulates user posts and sends them to the S3 bucket, and user_posting_emulation_streaming.py, which sends the posts to Amazon Kinesis.
 * Finally, we have the second notebook, `Kinesis-Connector`. This contains code which takes the kinesis stream and creates three delta tables streams with clean data. 
 
-## Licansing
+## Licensing
 MIT License
 
 Copyright (c) 2024 Michael Gowie
